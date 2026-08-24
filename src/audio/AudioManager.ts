@@ -25,10 +25,13 @@ export class AudioManager {
   private musicPlaying = false;
   private muted = false;
   private clickBuffer: HTMLAudioElement;
+  private static readonly MUTE_KEY = "qafzat_muted";
 
   constructor() {
     this.clickBuffer = new Audio("/assets/audio/ui/click.ogg");
     this.clickBuffer.volume = 0.5;
+    // نتذكر اختيار الكتم بين الجلسات عشان ما يرجع الصوت يشتغل تلقائياً بعد ما يطفيه المستخدم
+    this.muted = localStorage.getItem(AudioManager.MUTE_KEY) === "1";
   }
 
   // لازم يُستدعى بعد أول تفاعل من المستخدم (متطلب المتصفحات لتشغيل الصوت)
@@ -36,9 +39,10 @@ export class AudioManager {
     if (!this.ctx) {
       this.ctx = new AudioContext();
       this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = this.muted ? 0 : 1;
       this.masterGain.connect(this.ctx.destination);
       this.musicGain = this.ctx.createGain();
-      this.musicGain.gain.value = 0.18;
+      this.musicGain.gain.value = 0.09;
       this.musicGain.connect(this.masterGain);
       this.sfxGain = this.ctx.createGain();
       this.sfxGain.gain.value = 0.6;
@@ -51,6 +55,8 @@ export class AudioManager {
   setMuted(muted: boolean): void {
     this.muted = muted;
     if (this.masterGain) this.masterGain.gain.value = muted ? 0 : 1;
+    if (muted) this.stopMusic();
+    localStorage.setItem(AudioManager.MUTE_KEY, muted ? "1" : "0");
   }
 
   isMuted(): boolean {
@@ -152,18 +158,18 @@ export class AudioManager {
       const freq = scale[step % scale.length];
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = "triangle";
+      osc.type = "sine";
       osc.frequency.value = freq;
       const start = ctx.currentTime;
       gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(0.5, start + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.35);
+      gain.gain.exponentialRampToValueAtTime(0.5, start + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.5);
       osc.connect(gain);
       gain.connect(this.musicGain!);
       osc.start(start);
-      osc.stop(start + 0.4);
+      osc.stop(start + 0.55);
       step++;
-      this.musicTimer = window.setTimeout(playStep, 280);
+      this.musicTimer = window.setTimeout(playStep, 420);
     };
     playStep();
   }
