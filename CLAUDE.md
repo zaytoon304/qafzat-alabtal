@@ -7,7 +7,8 @@
 ## القرارات المقفولة (لا تعيد سؤال المستخدم عنها)
 - المسار: `/Users/mac/Desktop/أردوينو/المشاريع والكتب/qafzat-alabtal/`
 - التقنية: TypeScript + Vite + Phaser 3 + MediaPipe Tasks Vision (Pose Landmarker، محلي بالكامل عبر public/mediapipe)
-- الرسومات: Kenney.nl Scribble Platformer + UI Pack (CC0) — راجع public/assets/CREDITS.md
+- الرسومات: Kenney.nl Scribble Platformer + Platformer Characters + UI Pack (CC0) — راجع public/assets/CREDITS.md
+- الشخصيات: كل شخصية لها 6 وضعيات رسومية حقيقية (idle/jump/duck/walk1/hurt/cheer1) عبر `poseKey()` بـ`CharacterManager.ts`، تتبدّل فعلياً حسب حالة اللاعب بـ`GameScene.updatePlayerVisuals` — لا تلوين tint على رسمة واحدة
 - ممنوع Fake/Random Detection في أي مرحلة غير Debug Mode — والنظام فعلاً لا يستخدم عشوائية بمنطق الحركة
 
 ## انحرافات هندسية بسيطة عن الخطة الأصلية (وسببها)
@@ -36,3 +37,4 @@ npm run dev
 ## سجل التقدّم
 - 2026-08-24: إنشاء PLAN.md وCLAUDE.md (تخطيط).
 - 2026-08-24: بناء كامل لكل المراحل الـ11 (Boot→Vision→6 حركات→لعب كامل→تدريب→تخصيص→Power-ups→Boss→Multiplayer→حفظ→تلميع)، تنزيل أصول Kenney (CC0)، MediaPipe محلي بالكامل، 56 اختبار Vitest، تلميع "Juicy" (Squash&Stretch، Particles، عبارات تشجيع متنوعة، انتقالات Fade بين الشاشات)، تنظيم git بـ6 commits منطقية. الخطوة المتبقية الوحيدة: تجربة محمد الفعلية بالكاميرا.
+- 2026-08-25: استبدال رسومات الشخصيات الملوّنة (tint) برسومات حقيقية 6 وضعيات لكل شخصية (حزمة Kenney Platformer Characters) + خلفية مشهدية (سماء/غيوم/أرض/أشجار) بكل شاشات القوائم بدل الأسود المسطّح. أُنجز عبر فرع خلفي وترك الكود متوقفاً عن البناء (مراجع `def.tint` القديمة لم تُحدَّث)؛ أكملت الربط بكل الشاشات المتأثرة + وضعيات ديناميكية فعلية أثناء اللعب (قفز/انحناء/جري/إصابة) بدل تشويه Squash. تحقق: `tsc --noEmit` نظيف، `npm run build` نظيف، 56/56 Vitest، وفحص بصري حقيقي بالمتصفح (قائمة رئيسية، اختيار شخصية بكل الخمسة، الملف الشخصي بوضعية احتفال) بدون أي خطأ Console. 2 commits: `characters:` و`ui:`.
