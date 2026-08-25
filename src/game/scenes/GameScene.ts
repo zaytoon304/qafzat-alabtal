@@ -8,7 +8,7 @@ import { obstacleManager, type ObstacleInstance } from "../../obstacles/Obstacle
 import { collectibleManager, type CollectibleInstance } from "../../collectibles/CollectibleManager";
 import { powerUpManager, type PowerUpInstance } from "../../powerups/PowerUpManager";
 import { bossManager } from "../../boss/BossManager";
-import { characterManager } from "../../characters/CharacterManager";
+import { characterManager, poseKey, type CharacterPose } from "../../characters/CharacterManager";
 import { worldManager } from "../../worlds/WorldManager";
 import { visionController } from "../../vision/VisionController";
 import { motionRecognition } from "../../vision/MotionRecognition";
@@ -45,6 +45,7 @@ export class GameScene extends Phaser.Scene {
   private powerupSprites = new Map<number, Phaser.GameObjects.Image>();
   private consumedIds = new Set<string>();
   private playerSprites = new Map<number, Phaser.GameObjects.Image>();
+  private poseOverride = new Map<number, { pose: CharacterPose; until: number }>();
   private playerShieldFx = new Map<number, Phaser.GameObjects.Arc>();
 
   private hudScoreTexts = new Map<number, Phaser.GameObjects.Text>();
@@ -126,9 +127,10 @@ export class GameScene extends Phaser.Scene {
     players.forEach((p, i) => {
       const def = characterManager.get(p.character);
       const offset = players.length > 1 ? (i - (players.length - 1) / 2) * 18 : 0;
-      const sprite = this.add.image(LANE_X[1] + offset, PLAYER_Y, def.spriteKey).setDisplaySize(80, 80).setTint(def.tint);
+      const sprite = this.add.image(LANE_X[1] + offset, PLAYER_Y, poseKey(def.spriteKey, "idle")).setDisplaySize(80 * def.aspect, 80);
       sprite.setData("playerIndex", p.id);
       sprite.setData("offset", offset);
+      sprite.setData("character", p.character);
       this.playerSprites.set(p.id, sprite);
     });
   }
@@ -322,6 +324,7 @@ export class GameScene extends Phaser.Scene {
   private surprisedPulse(playerIndex: number): void {
     const sprite = this.playerSprites.get(playerIndex);
     if (!sprite) return;
+    this.poseOverride.set(playerIndex, { pose: "hurt", until: this.time.now + 350 });
     this.tweens.add({ targets: sprite, alpha: 0.3, duration: 90, yoyo: true, repeat: 3 });
     this.tweens.add({ targets: sprite, scaleX: sprite.scaleX * 0.85, scaleY: sprite.scaleY * 1.15, duration: 120, yoyo: true, ease: "Quad.easeOut" });
   }
@@ -451,14 +454,18 @@ export class GameScene extends Phaser.Scene {
       // نبضة حياة خفيفة وقت الجري العادي (Idle Bob) — يخلي الشخصية تحس حيّة لا جامدة
       const idleBob = !p.isJumping && !p.isDucking ? Math.sin(this.time.now / 180 + p.id) * 3 : 0;
       sprite.y = PLAYER_Y + jumpOffset + idleBob;
-      sprite.scaleY = p.isDucking ? 0.55 : 1;
-      sprite.scaleX = p.isDucking ? 1.2 : 1;
       sprite.angle = p.isTurning ? p.turnProgress * 360 : 0;
-      if (p.isHandRaised) sprite.setTint(0xffe082);
-      else {
-        const def = characterManager.get(p.character);
-        sprite.setTint(def.tint);
-      }
+
+      // وضعية الرسمة الحقيقية حسب حالة اللاعب (بدل تشويه Squash قديم على رسمة واحدة)
+      const def = characterManager.get(p.character);
+      const override = this.poseOverride.get(p.id);
+      let pose: CharacterPose;
+      if (override && this.time.now < override.until) pose = override.pose;
+      else if (p.isJumping) pose = "jump";
+      else if (p.isDucking) pose = "duck";
+      else pose = Math.floor(this.time.now / 180 + p.id * 2) % 2 === 0 ? "idle" : "walk1";
+      sprite.setTexture(poseKey(def.spriteKey, pose));
+      sprite.setTint(p.isHandRaised ? 0xffe082 : 0xffffff);
 
       if (p.isInvincible && !this.playerShieldFx.has(p.id)) {
         const fx = this.add.circle(sprite.x, sprite.y, 50, 0x4fd1c5, 0.25).setStrokeStyle(2, 0x4fd1c5);

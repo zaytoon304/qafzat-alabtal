@@ -2,13 +2,15 @@ import Phaser from "phaser";
 import { GameConfig } from "../../core/Config";
 import { storageManager } from "../../storage/LocalStorageManager";
 
-const CHAR_FILES: Record<string, string> = {
-  char_hero_boy: "character_roundRed",
-  char_hero_girl: "character_roundPurple",
-  char_robot: "character_squareGreen",
-  char_explorer: "character_squareYellow",
-  char_wizard: "character_squarePurple",
+// كل شخصية لها 6 وضعيات حقيقية (وقوف/قفز/انحناء/مشي/إصابة/احتفال) - حزمة Kenney "Platformer Characters"
+const CHAR_PREFIX: Record<string, string> = {
+  hero_boy: "player",
+  hero_girl: "female",
+  robot: "soldier",
+  explorer: "adventurer",
+  wizard: "zombie",
 };
+const CHAR_POSES = ["idle", "jump", "duck", "walk1", "hurt", "cheer1"] as const;
 
 const TILE_FILES = [
   "tile_block",
@@ -72,8 +74,10 @@ export class PreloadScene extends Phaser.Scene {
       pctText.setText(`${Math.round(v * 100)}%`);
     });
 
-    for (const [key, file] of Object.entries(CHAR_FILES)) {
-      this.load.image(key, `/assets/images/characters/${file}.png`);
+    for (const [charKey, prefix] of Object.entries(CHAR_PREFIX)) {
+      for (const pose of CHAR_POSES) {
+        this.load.image(`char_${charKey}_${pose}`, `/assets/images/characters/heroes/${prefix}_${pose}.png`);
+      }
     }
     for (const file of TILE_FILES) {
       this.load.image(file, `/assets/images/tiles/${file}.png`);

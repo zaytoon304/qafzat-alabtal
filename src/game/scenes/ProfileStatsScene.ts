@@ -1,9 +1,9 @@
 import Phaser from "phaser";
 import { GameConfig } from "../../core/Config";
 import { storageManager } from "../../storage/LocalStorageManager";
-import { characterManager } from "../../characters/CharacterManager";
+import { characterManager, poseKey } from "../../characters/CharacterManager";
 import { ACHIEVEMENTS } from "../../scoring/AchievementManager";
-import { titleText, bodyText, createBigButton, createPanel } from "../../ui/UIKit";
+import { titleText, bodyText, createBigButton, createPanel, sceneBackdrop } from "../../ui/UIKit";
 
 // ملف اللاعب — بند 24
 export class ProfileStatsScene extends Phaser.Scene {
@@ -13,7 +13,7 @@ export class ProfileStatsScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = GameConfig.screen;
-    this.cameras.main.setBackgroundColor("#0b1020");
+    sceneBackdrop(this);
     const profile = storageManager.getActiveProfile();
 
     if (!profile) {
@@ -23,7 +23,7 @@ export class ProfileStatsScene extends Phaser.Scene {
 
     const charDef = characterManager.get(profile.character);
     titleText(this, width / 2, 55, `👤 ${profile.name}`);
-    this.add.image(width / 2, 130, charDef.spriteKey).setDisplaySize(90, 90).setTint(charDef.tint);
+    this.add.image(width / 2, 130, poseKey(charDef.spriteKey, "cheer1")).setDisplaySize(90 * charDef.aspect, 90);
 
     createPanel(this, width / 2, 250, 560, 140);
     bodyText(this, width / 2, 210, `🏆 أفضل نتيجة: ${profile.highestScore}`, "22px");
