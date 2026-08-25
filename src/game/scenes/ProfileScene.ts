@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { GameConfig } from "../../core/Config";
 import { storageManager } from "../../storage/LocalStorageManager";
-import { titleText, bodyText, createBigButton, createPanel } from "../../ui/UIKit";
+import { titleText, bodyText, createBigButton, createPanel, sceneBackdrop } from "../../ui/UIKit";
 
 // إنشاء/اختيار ملف اللاعب — بند 24. اسم اللاعب يُدخل عبر حقل نصي حقيقي فوق الـ Canvas
 export class ProfileScene extends Phaser.Scene {
@@ -13,7 +13,7 @@ export class ProfileScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = GameConfig.screen;
-    this.cameras.main.setBackgroundColor("#0b1020");
+    sceneBackdrop(this);
 
     titleText(this, width / 2, 90, "من سيلعب اليوم؟");
     createPanel(this, width / 2, height / 2, 520, 260);

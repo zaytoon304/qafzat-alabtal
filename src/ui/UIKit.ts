@@ -78,3 +78,30 @@ export function bodyText(scene: Phaser.Scene, x: number, y: number, label: strin
 export function backButton(scene: Phaser.Scene, onClick: () => void): Phaser.GameObjects.Container {
   return createBigButton(scene, 90, 40, "رجوع", "grey", onClick, { width: 130, fontSize: "20px", icon: "◀" });
 }
+
+// خلفية مشهدية موحّدة (سماء متدرّجة + غيوم + أرض + أشجار) بدل الشاشة السوداء المسطّحة - تُستخدم بكل شاشات القوائم
+export function sceneBackdrop(scene: Phaser.Scene): void {
+  const { width, height } = scene.game.config as { width: number; height: number };
+  const w = Number(width) || 1366;
+  const h = Number(height) || 896;
+
+  const g = scene.add.graphics();
+  g.fillGradientStyle(0x6fc3ff, 0x6fc3ff, 0xbdeeb0, 0xbdeeb0, 1);
+  g.fillRect(0, 0, w, h);
+
+  scene.add.image(w * 0.12, h * 0.12, "background_cloudA").setAlpha(0.85).setScale(0.7);
+  scene.add.image(w * 0.55, h * 0.08, "background_cloudB").setAlpha(0.75).setScale(0.55);
+  scene.add.image(w * 0.85, h * 0.16, "background_cloudA").setAlpha(0.65).setScale(0.45);
+
+  const groundY = h - 70;
+  scene.add.rectangle(w / 2, groundY + 45, w, 140, 0x4caf50);
+  scene.add.rectangle(w / 2, groundY - 5, w, 6, 0x2e7d32).setAlpha(0.6);
+
+  const treePositions = [0.04, 0.94, 0.24, 0.76];
+  treePositions.forEach((fx, i) => {
+    const img = scene.add.image(w * fx, groundY - 6, i % 2 === 0 ? "background_treeLarge" : "background_tree");
+    img.setScale(i % 2 === 0 ? 0.55 : 0.4);
+    img.setOrigin(0.5, 1);
+    img.setAlpha(0.9);
+  });
+}

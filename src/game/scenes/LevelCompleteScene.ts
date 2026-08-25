@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { GameConfig } from "../../core/Config";
-import { titleText, bodyText, createBigButton } from "../../ui/UIKit";
+import { titleText, bodyText, createBigButton, sceneBackdrop } from "../../ui/UIKit";
 
 interface ResultData {
   score: number;
@@ -17,7 +17,7 @@ export class LevelCompleteScene extends Phaser.Scene {
 
   create(data: ResultData): void {
     const { width, height } = GameConfig.screen;
-    this.cameras.main.setBackgroundColor("#0b1020");
+    sceneBackdrop(this);
     this.cameras.main.fadeIn(250, 11, 16, 32);
     this.add.particles(width / 2, 0, "tile_gem", {
       x: { min: 0, max: width },

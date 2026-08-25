@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { GameConfig } from "../../core/Config";
 import { leaderboard } from "../../scoring/Leaderboard";
 import { characterManager } from "../../characters/CharacterManager";
-import { titleText, bodyText, createBigButton } from "../../ui/UIKit";
+import { titleText, bodyText, createBigButton, sceneBackdrop } from "../../ui/UIKit";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
 
@@ -14,7 +14,7 @@ export class LeaderboardScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = GameConfig.screen;
-    this.cameras.main.setBackgroundColor("#0b1020");
+    sceneBackdrop(this);
     titleText(this, width / 2, 55, "🏆 لوحة الأبطال");
 
     const entries = leaderboard.top(8);

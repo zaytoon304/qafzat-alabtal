@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { GameConfig } from "../../core/Config";
 import { WORLDS, worldManager } from "../../worlds/WorldManager";
-import { titleText, createPanel, bodyText } from "../../ui/UIKit";
+import { titleText, createPanel, bodyText, sceneBackdrop } from "../../ui/UIKit";
 import { session } from "../Session";
 import { storageManager } from "../../storage/LocalStorageManager";
 import { audioManager } from "../../audio/AudioManager";
@@ -24,7 +24,7 @@ export class WorldSelectScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = GameConfig.screen;
-    this.cameras.main.setBackgroundColor("#0b1020");
+    sceneBackdrop(this);
     titleText(this, width / 2, 60, "اختر العالم");
 
     const profile = storageManager.getActiveProfile();

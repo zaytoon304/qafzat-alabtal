@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { GameConfig } from "../../core/Config";
-import { titleText, bodyText, createBigButton, createPanel } from "../../ui/UIKit";
+import { titleText, bodyText, createBigButton, createPanel, sceneBackdrop } from "../../ui/UIKit";
 import { audioManager } from "../../audio/AudioManager";
 
 // الإعدادات — بند 7
@@ -13,7 +13,7 @@ export class SettingsScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = GameConfig.screen;
-    this.cameras.main.setBackgroundColor("#0b1020");
+    sceneBackdrop(this);
     titleText(this, width / 2, 60, "⚙️ الإعدادات");
 
     createPanel(this, width / 2, 180, 480, 90);
